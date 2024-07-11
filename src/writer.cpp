@@ -3,20 +3,34 @@
 #include <bit>
 #include <fstream>
 
-BinaryWriter::BinaryWriter(size_t size, ByteOrder byteOrder) : mByteOrder(byteOrder) {
-	mInner = std::vector<u8>(size);
-}
+BinaryWriter::BinaryWriter(ByteOrder byteOrder) : mByteOrder(byteOrder) {}
 
-void BinaryWriter::save(const char* filename) {
+void BinaryWriter::save(const char* filename) const {
 	std::ofstream outfile(filename, std::ios::out | std::ios::binary);
 	outfile.write(reinterpret_cast<const char*>(mInner.data()), mInner.size());
 }
 
+void BinaryWriter::seek(size_t position) {
+	if (position > mInner.size()) {
+		mInner.resize(position);
+	}
+	mCursor = position;
+}
+
+void BinaryWriter::checkSize(size_t elementSize) {
+	size_t space_to_end = mInner.size() - mCursor;
+	if (space_to_end < elementSize) {
+		mInner.resize(mInner.size() + elementSize - space_to_end);
+	}
+}
+
 void BinaryWriter::writeU8(u8 value) {
+	checkSize(sizeof(u8));
 	mInner.at(mCursor++) = value;
 }
 
 void BinaryWriter::writeU16(u16 value) {
+	checkSize(sizeof(u16));
 	if (mByteOrder == ByteOrder::Big) {
 		mInner.at(mCursor++) = (value >> 8) & 0xff;
 		mInner.at(mCursor++) = value & 0xff;
@@ -27,6 +41,8 @@ void BinaryWriter::writeU16(u16 value) {
 }
 
 void BinaryWriter::writeU24(u32 value) {
+	checkSize(3);
+
 	if (mByteOrder == ByteOrder::Big) {
 		mInner.at(mCursor++) = (value >> 16) & 0xff;
 		mInner.at(mCursor++) = (value >> 8) & 0xff;
@@ -39,6 +55,8 @@ void BinaryWriter::writeU24(u32 value) {
 }
 
 void BinaryWriter::writeU32(u32 value) {
+	checkSize(sizeof(u32));
+
 	if (mByteOrder == ByteOrder::Big) {
 		mInner.at(mCursor++) = (value >> 24) & 0xff;
 		mInner.at(mCursor++) = (value >> 16) & 0xff;
@@ -53,6 +71,8 @@ void BinaryWriter::writeU32(u32 value) {
 }
 
 void BinaryWriter::writeU64(u64 value) {
+	checkSize(sizeof(u64));
+
 	if (mByteOrder == ByteOrder::Big) {
 		mInner.at(mCursor++) = (value >> 56) & 0xff;
 		mInner.at(mCursor++) = (value >> 48) & 0xff;

@@ -9,8 +9,14 @@ enum class ByteOrder { Big, Little };
 
 class BinaryWriter {
 public:
-	BinaryWriter(size_t size, ByteOrder byteOrder);
+	BinaryWriter(ByteOrder byteOrder);
 	
+	void save(const char* filename) const;
+	void seek(size_t position);
+
+	size_t size() const { return mInner.size(); }
+	size_t position() const { return mCursor; }
+
 	void writeU8(u8 value);
 	void writeU16(u16 value);
 	void writeU24(u32 value);
@@ -25,9 +31,9 @@ public:
 	void writeF32(f32 value);
 	void writeF64(f64 value);
 
-	void save(const char* filename);
-
 private:
+	void checkSize(size_t elementSize);
+
 	ByteOrder mByteOrder;
 	size_t mCursor = 0;
 	std::vector<u8> mInner;
