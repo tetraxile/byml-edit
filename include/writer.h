@@ -13,6 +13,7 @@ public:
 	
 	void writeU8(u8 value);
 	void writeU16(u16 value);
+	void writeU24(u32 value);
 	void writeU32(u32 value);
 	void writeU64(u64 value);
 
