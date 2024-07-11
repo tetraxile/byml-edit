@@ -1,6 +1,3 @@
-#include <fstream>
-#include <vector>
-
 #include "types.h"
 #include "writer.h"
 

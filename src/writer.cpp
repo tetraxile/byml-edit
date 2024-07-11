@@ -1,6 +1,5 @@
 #include "writer.h"
 
-#include <cstdio>
 #include <fstream>
 
 BinaryWriter::BinaryWriter(size_t size, ByteOrder byteOrder) : mByteOrder(byteOrder) {
